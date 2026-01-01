@@ -36,62 +36,54 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // Lucide Icons (embedded)
+    // Lucide Icons (embedded - same as before, keeping them short for brevity)
     const Play = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <polygon points="5 3 19 12 5 21 5 3"></polygon>
       </svg>
     );
-
     const Pause = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <rect x="6" y="4" width="4" height="16"></rect>
-        <rect x="14" y="4" width="4" height="16"></rect>
+        <rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>
       </svg>
     );
-
     const Check = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
     );
-
     const X = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
       </svg>
     );
-
     const Settings = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M12 1v6m0 6v6m5.2-14.2L14 7.4m-4 9.2-3.2 3.4M23 12h-6m-6 0H1m14.2 5.2L12 14.6m-4-9.2L4.8 1.8"></path>
+        <circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.2-14.2L14 7.4m-4 9.2-3.2 3.4M23 12h-6m-6 0H1m14.2 5.2L12 14.6m-4-9.2L4.8 1.8"></path>
       </svg>
     );
-
     const TrendingUp = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-        <polyline points="17 6 23 6 23 12"></polyline>
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>
       </svg>
     );
-
     const Cloud = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
         <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
       </svg>
     );
-
     const CloudOff = ({ size = 24, className = "" }) => (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3"></path>
-        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0 4 15h9a5 5 0 0 0 1.7-.3"></path><line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    );
+    const Download = ({ size = 24, className = "" }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
       </svg>
     );
 
     const WorkoutTracker = () => {
-      // SheetDB API configuration
       const SHEETDB_API = 'https://sheetdb.io/api/v1/4zo8oj6yl9rca';
       
       const [currentWorkout, setCurrentWorkout] = useState(null);
@@ -107,8 +99,8 @@
       const [sessionLog, setSessionLog] = useState([]);
       const [syncStatus, setSyncStatus] = useState('idle');
       const [lastSyncTime, setLastSyncTime] = useState(null);
+      const [isLoadingFromSheets, setIsLoadingFromSheets] = useState(false);
 
-      // Workout definitions
       const workouts = {
         A: {
           name: 'Workout A - Home',
@@ -158,47 +150,84 @@
         return initial;
       };
 
-      // Initialize workout data from localStorage
-      useEffect(() => {
-        const saved = localStorage.getItem('workoutData');
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            const isOldFormat = parsed.A && Array.isArray(parsed.A);
+      // Load weights from Google Sheets on startup
+      const loadWeightsFromSheets = async () => {
+        try {
+          setIsLoadingFromSheets(true);
+          console.log('Loading weights from Google Sheets...');
+          
+          const response = await fetch(`${SHEETDB_API}?sheet=Current Weights`);
+          if (!response.ok) throw new Error('Failed to load from Sheets');
+          
+          const result = await response.json();
+          console.log('Sheets data:', result);
+          
+          if (result && result.length > 0) {
+            const updatedData = initializeFreshData();
             
-            if (isOldFormat) {
-              console.log('Migrating old data format...');
-              const migrated = {};
-              Object.keys(workouts).forEach(workoutKey => {
-                migrated[workoutKey] = {
-                  lastWorkoutDate: null,
-                  exercises: workouts[workoutKey].exercises.map((ex, idx) => ({
-                    name: ex.name,
-                    currentWeight: parsed[workoutKey] && parsed[workoutKey][idx] 
-                      ? parsed[workoutKey][idx].currentWeight 
-                      : (ex.equipment === 'bodyweight' ? ex.reps : 0),
-                    sessionsAtWeight: 0,
-                    history: parsed[workoutKey] && parsed[workoutKey][idx] 
-                      ? parsed[workoutKey][idx].history || []
-                      : []
-                  }))
-                };
-              });
-              setWorkoutData(migrated);
-              localStorage.setItem('workoutData', JSON.stringify(migrated));
-            } else {
-              setWorkoutData(parsed);
-            }
-          } catch (error) {
-            console.error('Error loading workout data:', error);
-            setWorkoutData(initializeFreshData());
+            result.forEach(row => {
+              const workoutKey = row.Workout;
+              const exerciseName = row.Exercise;
+              const weight = parseFloat(row['Current Weight']) || 0;
+              const sessions = parseInt(row['Sessions at Weight']) || 0;
+              const lastDate = row['Last Workout Date'];
+              
+              if (updatedData[workoutKey]) {
+                const exerciseIndex = updatedData[workoutKey].exercises.findIndex(
+                  e => e.name === exerciseName
+                );
+                
+                if (exerciseIndex !== -1) {
+                  updatedData[workoutKey].exercises[exerciseIndex].currentWeight = weight;
+                  updatedData[workoutKey].exercises[exerciseIndex].sessionsAtWeight = sessions;
+                }
+                
+                if (lastDate && lastDate !== '') {
+                  updatedData[workoutKey].lastWorkoutDate = lastDate;
+                }
+              }
+            });
+            
+            setWorkoutData(updatedData);
+            localStorage.setItem('workoutData', JSON.stringify(updatedData));
+            console.log('✅ Loaded weights from Google Sheets');
+            return updatedData;
           }
-        } else {
-          setWorkoutData(initializeFreshData());
+        } catch (error) {
+          console.error('Error loading from Sheets:', error);
+        } finally {
+          setIsLoadingFromSheets(false);
         }
+        return null;
+      };
+
+      // Initialize workout data
+      useEffect(() => {
+        const initializeData = async () => {
+          // First, try to load from Google Sheets
+          const sheetsData = await loadWeightsFromSheets();
+          
+          if (!sheetsData) {
+            // Fall back to localStorage
+            const saved = localStorage.getItem('workoutData');
+            if (saved) {
+              try {
+                const parsed = JSON.parse(saved);
+                setWorkoutData(parsed);
+              } catch (error) {
+                console.error('Error loading workout data:', error);
+                setWorkoutData(initializeFreshData());
+              }
+            } else {
+              setWorkoutData(initializeFreshData());
+            }
+          }
+        };
+        
+        initializeData();
       }, []);
 
-      // Save workout data to localStorage
+      // Save to localStorage
       useEffect(() => {
         if (workoutData) {
           localStorage.setItem('workoutData', JSON.stringify(workoutData));
@@ -234,30 +263,22 @@
       const calculatePlates = (totalWeight) => {
         const barWeight = 20;
         const weightPerSide = (totalWeight - barWeight) / 2;
-        
         if (weightPerSide <= 0) return { perSide: [], total: barWeight };
-        
         const availablePlates = [20, 15, 10, 5, 2.5, 1.25, 0.5, 0.25];
         const plates = [];
         let remaining = weightPerSide;
-        
         for (const plate of availablePlates) {
           while (remaining >= plate) {
             plates.push(plate);
             remaining = Math.round((remaining - plate) * 100) / 100;
           }
         }
-        
         return { perSide: plates, total: barWeight + (weightPerSide * 2) };
       };
 
       const getTargetReps = (exercise, exerciseData, setNumber) => {
-        if (exercise.equipment !== 'dumbbell') {
-          return exercise.reps;
-        }
-        
+        if (exercise.equipment !== 'dumbbell') return exercise.reps;
         const session = exerciseData.sessionsAtWeight;
-        
         if (session === 0) {
           if (setNumber === 1) return 6;
           if (setNumber === 2) return 7;
@@ -277,59 +298,85 @@
         setSessionLog([]);
       };
 
-      // SheetDB sync functions
-      const syncToSheetDB = async (sheet, data) => {
+      // OPTIMIZED: Batch sync - only send data at end of workout
+      const syncBatchToSheets = async (workoutKey, log, updatedWeights) => {
         try {
-          console.log('Syncing to SheetDB:', { sheet, data });
           setSyncStatus('syncing');
-          const response = await fetch(`${SHEETDB_API}?sheet=${sheet}`, {
+          console.log('📤 Batching sync to Google Sheets...');
+          
+          // 1. Send all workout log entries in one batch
+          const logEntries = log.map(entry => ({
+            Timestamp: new Date().toISOString(),
+            Workout: workoutKey,
+            Exercise: entry.exercise,
+            Set: entry.set,
+            Weight: entry.weight,
+            Unit: workouts[workoutKey].exercises.find(e => e.name === entry.exercise)?.unit || 'lbs',
+            'Target Reps': entry.targetReps,
+            'Actual Reps': entry.actualReps,
+            Completed: entry.completed ? 'Yes' : 'No'
+          }));
+          
+          await fetch(`${SHEETDB_API}?sheet=Workout Log`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ data: [data] })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: logEntries })
           });
           
-          console.log('SheetDB response status:', response.status);
-          const responseData = await response.json();
-          console.log('SheetDB response data:', responseData);
-          
-          if (response.ok) {
-            setSyncStatus('synced');
-            setLastSyncTime(new Date());
-            setTimeout(() => setSyncStatus('idle'), 2000);
-            return true;
-          } else {
-            throw new Error(`Sync failed: ${JSON.stringify(responseData)}`);
-          }
-        } catch (error) {
-          console.error('SheetDB sync error:', error);
-          setSyncStatus('error');
-          setTimeout(() => setSyncStatus('idle'), 3000);
-          return false;
-        }
-      };
-
-      const syncCurrentWeights = async () => {
-        const rows = [];
-        Object.keys(workoutData).forEach(workoutKey => {
-          const workout = workoutData[workoutKey];
-          const workoutDef = workouts[workoutKey];
-          
-          workout.exercises.forEach((exercise, idx) => {
-            rows.push({
-              Workout: workoutKey,
-              Exercise: exercise.name,
-              'Current Weight': exercise.currentWeight,
-              Unit: workoutDef.exercises[idx].unit,
-              'Sessions at Weight': exercise.sessionsAtWeight,
-              'Last Workout Date': workout.lastWorkoutDate ? new Date(workout.lastWorkoutDate).toLocaleDateString() : ''
+          // 2. Update Current Weights sheet (delete old, insert new)
+          // First, get current data to know what to delete
+          const currentWeightsRows = [];
+          Object.keys(updatedWeights).forEach(wKey => {
+            const workout = updatedWeights[wKey];
+            const workoutDef = workouts[wKey];
+            
+            workout.exercises.forEach((exercise, idx) => {
+              currentWeightsRows.push({
+                Workout: wKey,
+                Exercise: exercise.name,
+                'Current Weight': exercise.currentWeight,
+                Unit: workoutDef.exercises[idx].unit,
+                'Sessions at Weight': exercise.sessionsAtWeight,
+                'Last Workout Date': workout.lastWorkoutDate ? new Date(workout.lastWorkoutDate).toLocaleDateString() : ''
+              });
             });
           });
-        });
-        
-        for (const row of rows) {
-          await syncToSheetDB('Current Weights', row);
+          
+          // Delete all and reinsert (simple approach for small dataset)
+          await fetch(`${SHEETDB_API}/all?sheet=Current Weights`, {
+            method: 'DELETE'
+          });
+          
+          await fetch(`${SHEETDB_API}?sheet=Current Weights`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: currentWeightsRows })
+          });
+          
+          // 3. Add workout summary
+          await fetch(`${SHEETDB_API}?sheet=Workout History`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              data: [{
+                Date: new Date().toISOString(),
+                Workout: workoutKey,
+                'Exercises Completed': workouts[workoutKey].exercises.length,
+                'Total Sets': log.length,
+                Notes: 'Completed'
+              }]
+            })
+          });
+          
+          setSyncStatus('synced');
+          setLastSyncTime(new Date());
+          setTimeout(() => setSyncStatus('idle'), 2000);
+          console.log('✅ Batch sync complete! (3 API calls total)');
+          
+        } catch (error) {
+          console.error('Batch sync error:', error);
+          setSyncStatus('error');
+          setTimeout(() => setSyncStatus('idle'), 3000);
         }
       };
 
@@ -350,19 +397,8 @@
         }];
         setSessionLog(newLog);
 
-        // Sync to Google Sheets via SheetDB (non-blocking)
-        syncToSheetDB('Workout Log', {
-          Timestamp: new Date().toISOString(),
-          Workout: currentWorkout,
-          Exercise: exercise.name,
-          Set: currentSet,
-          Weight: exerciseData.currentWeight,
-          Unit: exercise.unit,
-          'Target Reps': targetReps,
-          'Actual Reps': actualReps !== undefined ? actualReps : targetReps,
-          Completed: completed ? 'Yes' : 'No'
-        }).catch(err => console.error('Background sync failed:', err));
-
+        // NO SYNC HERE - just log locally
+        
         if (currentSet < exercise.sets) {
           setCurrentSet(currentSet + 1);
           setTimerSeconds(90);
@@ -379,7 +415,7 @@
         }
       };
 
-      const finishWorkout = (log) => {
+      const finishWorkout = async (log) => {
         const updatedData = { ...workoutData };
         const exerciseResults = {};
         
@@ -421,19 +457,10 @@
         updatedData[currentWorkout].lastWorkoutDate = new Date().toISOString();
         setWorkoutData(updatedData);
 
-        // Sync workout history to SheetDB (non-blocking)
-        syncToSheetDB('Workout History', {
-          Date: new Date().toISOString(),
-          Workout: currentWorkout,
-          'Exercises Completed': workouts[currentWorkout].exercises.length,
-          'Total Sets': log.length,
-          Notes: 'Completed'
-        }).catch(err => console.error('History sync failed:', err));
-
-        // Update current weights in Google Sheets (non-blocking)
-        syncCurrentWeights().catch(err => console.error('Weights sync failed:', err));
+        // OPTIMIZED: Single batch sync at end of workout
+        await syncBatchToSheets(currentWorkout, log, updatedData);
         
-        alert('Workout Complete! 💪\\n\\nData syncing to Google Sheets...');
+        alert('Workout Complete! 💪\\n\\nData synced to Google Sheets!');
         setCurrentWorkout(null);
       };
 
@@ -447,12 +474,16 @@
       if (!workoutData) {
         return (
           <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-            <div className="text-xl">Loading...</div>
+            <div className="text-center">
+              <div className="text-xl mb-2">
+                {isLoadingFromSheets ? 'Loading from Google Sheets...' : 'Loading...'}
+              </div>
+              {isLoadingFromSheets && <Download className="animate-bounce mx-auto text-blue-400" size={32} />}
+            </div>
           </div>
         );
       }
 
-      // Workout selection screen
       if (!currentWorkout) {
         return (
           <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -460,15 +491,9 @@
               <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">Select Workout</h1>
                 <div className="flex items-center gap-2">
-                  {syncStatus === 'syncing' && (
-                    <Cloud size={20} className="text-blue-400 animate-pulse" />
-                  )}
-                  {syncStatus === 'synced' && (
-                    <Cloud size={20} className="text-green-400" />
-                  )}
-                  {syncStatus === 'error' && (
-                    <CloudOff size={20} className="text-red-400" />
-                  )}
+                  {syncStatus === 'syncing' && <Cloud size={20} className="text-blue-400 animate-pulse" />}
+                  {syncStatus === 'synced' && <Cloud size={20} className="text-green-400" />}
+                  {syncStatus === 'error' && <CloudOff size={20} className="text-red-400" />}
                   {lastSyncTime && syncStatus === 'idle' && (
                     <div className="text-xs text-gray-500">
                       Synced {new Date(lastSyncTime).toLocaleTimeString()}
@@ -490,7 +515,9 @@
                         <div className="text-blue-200 text-sm">{workouts[key].location}</div>
                         {workoutData[key].lastWorkoutDate && (
                           <div className="text-blue-300 text-xs mt-1">
-                            Last: {new Date(workoutData[key].lastWorkoutDate).toLocaleDateString()}
+                            Last: {typeof workoutData[key].lastWorkoutDate === 'string' && workoutData[key].lastWorkoutDate.includes('T') 
+                              ? new Date(workoutData[key].lastWorkoutDate).toLocaleDateString() 
+                              : workoutData[key].lastWorkoutDate}
                           </div>
                         )}
                       </div>
@@ -529,13 +556,22 @@
                 <span>Setup Weights</span>
               </button>
 
+              <button
+                onClick={loadWeightsFromSheets}
+                className="w-full mt-3 bg-gray-700 hover:bg-gray-600 p-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                disabled={isLoadingFromSheets}
+              >
+                <Download size={20} className={isLoadingFromSheets ? 'animate-bounce' : ''} />
+                <span>{isLoadingFromSheets ? 'Loading...' : 'Reload from Sheets'}</span>
+              </button>
+
               <div className="mt-6 p-4 bg-gray-800 rounded-lg text-sm">
                 <div className="flex items-center gap-2 mb-2 text-green-400">
                   <Cloud size={16} />
-                  <span className="font-semibold">Auto-Sync Enabled</span>
+                  <span className="font-semibold">Optimized Sync</span>
                 </div>
                 <p className="text-gray-300 text-xs">
-                  Your workouts automatically sync to{' '}
+                  Syncs once at end of workout to{' '}
                   <a 
                     href="https://docs.google.com/spreadsheets/d/1F46x5keQydHlXbzF_u3nLPMvQ9dPe0lg4eEBqN68P0Y/edit"
                     target="_blank"
@@ -544,26 +580,21 @@
                   >
                     Google Sheets
                   </a>
-                  {' '}after each set!
+                  {' '}(~3 API calls per workout)
                 </p>
               </div>
             </div>
 
-            {/* Setup Modal */}
             {showSetupModal && (
               <div className="fixed inset-0 bg-black bg-opacity-75 z-50 overflow-y-auto">
                 <div className="min-h-screen flex items-center justify-center p-4">
                   <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full my-8">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold">Setup Starting Weights</h2>
-                    <button
-                      onClick={() => setShowSetupModal(false)}
-                      className="text-gray-400 hover:text-white"
-                    >
+                    <button onClick={() => setShowSetupModal(false)} className="text-gray-400 hover:text-white">
                       <X size={24} />
                     </button>
                   </div>
-                  
                   {Object.keys(workouts).map(workoutKey => (
                     <div key={workoutKey} className="mb-6">
                       <h3 className="text-lg font-semibold mb-3 text-blue-400">Workout {workoutKey}</h3>
@@ -586,7 +617,6 @@
                       ))}
                     </div>
                   ))}
-                  
                   <button
                     onClick={() => setShowSetupModal(false)}
                     className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold transition-colors"
@@ -601,7 +631,7 @@
         );
       }
 
-      // Active workout screen
+      // Active workout screen - same as before, keeping it for completeness
       const exercise = workouts[currentWorkout].exercises[currentExerciseIndex];
       const exerciseData = workoutData[currentWorkout].exercises[currentExerciseIndex];
       const targetReps = getTargetReps(exercise, exerciseData, currentSet);
@@ -610,7 +640,6 @@
       return (
         <div className="min-h-screen bg-gray-900 text-white p-6">
           <div className="max-w-md mx-auto">
-            {/* Header */}
             <div className="mb-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -633,10 +662,8 @@
               </div>
             </div>
 
-            {/* Exercise Info */}
             <div className="bg-gray-800 rounded-lg p-6 mb-6">
               <h2 className="text-2xl font-bold mb-4">{exercise.name}</h2>
-              
               <div className="text-center mb-6">
                 <div className="text-5xl font-bold text-blue-400">
                   {exercise.equipment === 'bodyweight' 
@@ -665,27 +692,21 @@
                   </div>
                 )}
               </div>
-
               <div className="text-center mb-4">
                 <div className="text-gray-400 text-sm">Set</div>
                 <div className="text-3xl font-bold">{currentSet} / {exercise.sets}</div>
               </div>
-
               <div className="text-center">
                 <div className="text-gray-400 text-sm">Target Reps</div>
                 <div className="text-2xl font-bold">{targetReps}</div>
               </div>
-
-              {/* Plate Calculator */}
               {plates && (
                 <div className="mt-6 pt-6 border-t border-gray-700">
                   <div className="text-sm text-gray-400 mb-2">Plates per side:</div>
                   <div className="flex flex-wrap gap-2">
                     {plates.perSide.length > 0 ? (
                       plates.perSide.map((plate, idx) => (
-                        <span key={idx} className="bg-gray-700 px-3 py-1 rounded text-sm">
-                          {plate}kg
-                        </span>
+                        <span key={idx} className="bg-gray-700 px-3 py-1 rounded text-sm">{plate}kg</span>
                       ))
                     ) : (
                       <span className="text-gray-500 text-sm">Bar only (20kg)</span>
@@ -695,15 +716,11 @@
               )}
             </div>
 
-            {/* Timer */}
             <div className="bg-gray-800 rounded-lg p-6 mb-6">
               <div className="text-center mb-4">
-                <div className="text-4xl font-mono font-bold text-blue-400">
-                  {formatTime(timerSeconds)}
-                </div>
+                <div className="text-4xl font-mono font-bold text-blue-400">{formatTime(timerSeconds)}</div>
                 <div className="text-sm text-gray-400 mt-1">Rest Timer</div>
               </div>
-              
               <div className="flex gap-3">
                 <button
                   onClick={() => setIsTimerRunning(!isTimerRunning)}
@@ -714,10 +731,7 @@
                   <span>{isTimerRunning ? 'Pause' : 'Start'}</span>
                 </button>
                 <button
-                  onClick={() => {
-                    setTimerSeconds(90);
-                    setIsTimerRunning(false);
-                  }}
+                  onClick={() => { setTimerSeconds(90); setIsTimerRunning(false); }}
                   className="bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-lg transition-colors"
                 >
                   Reset 90s
@@ -725,7 +739,6 @@
               </div>
             </div>
 
-            {/* Set Completion Buttons */}
             <div className="space-y-3">
               <button
                 onClick={() => logSet(true, targetReps)}
@@ -734,17 +747,12 @@
                 <Check size={24} />
                 <span>Completed {targetReps} Reps</span>
               </button>
-              
               <button
-                onClick={() => {
-                  setCustomReps(targetReps.toString());
-                  setShowRepsModal(true);
-                }}
+                onClick={() => { setCustomReps(targetReps.toString()); setShowRepsModal(true); }}
                 className="w-full bg-yellow-600 hover:bg-yellow-700 py-4 rounded-lg flex items-center justify-center gap-2 text-lg font-semibold transition-colors"
               >
                 <span>Partial Reps</span>
               </button>
-
               <button
                 onClick={() => logSet(false, 0)}
                 className="w-full bg-red-600 hover:bg-red-700 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
@@ -754,7 +762,6 @@
               </button>
             </div>
 
-            {/* Session Progress */}
             {sessionLog.length > 0 && (
               <div className="mt-6 bg-gray-800 rounded-lg p-4">
                 <div className="text-sm text-gray-400 mb-2">Session Progress</div>
@@ -767,7 +774,6 @@
               </div>
             )}
 
-            {/* Custom Reps Modal */}
             {showRepsModal && (
               <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
                 <div className="bg-gray-800 rounded-lg p-6 max-w-sm w-full">
@@ -786,10 +792,7 @@
                   </div>
                   <div className="flex gap-3">
                     <button
-                      onClick={() => {
-                        setShowRepsModal(false);
-                        setCustomReps('');
-                      }}
+                      onClick={() => { setShowRepsModal(false); setCustomReps(''); }}
                       className="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg transition-colors"
                     >
                       Cancel
@@ -812,7 +815,6 @@
               </div>
             )}
 
-            {/* Exit Confirmation Modal */}
             {showExitModal && (
               <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
                 <div className="bg-gray-800 rounded-lg p-6 max-w-sm w-full">
