@@ -116,8 +116,8 @@
           name: 'Workout B - Gym',
           location: 'Gym',
           exercises: [
-            { name: 'Barbell Squats', sets: 5, reps: 5, equipment: 'barbell', unit: 'kg', increment: 0.5 },
-            { name: 'Barbell Deadlift', sets: 5, reps: 5, equipment: 'barbell', unit: 'kg', increment: 0.5 },
+            { name: 'Barbell Squats', sets: 5, reps: 5, equipment: 'barbell', unit: 'kg', increment: 5 },
+            { name: 'Barbell Deadlift', sets: 5, reps: 5, equipment: 'barbell', unit: 'kg', increment: 5 },
             { name: 'Pullups', sets: 3, reps: 8, equipment: 'bodyweight', unit: 'reps', increment: 1 }
           ]
         },
@@ -317,14 +317,17 @@
             Completed: entry.completed ? 'Yes' : 'No'
           }));
           
-          await fetch(`${SHEETDB_API}?sheet=Workout Log`, {
+          const logResponse = await fetch(`${SHEETDB_API}?sheet=Workout Log`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ data: logEntries })
           });
           
+          if (!logResponse.ok) {
+            console.warn('Workout log sync failed, but continuing...');
+          }
+          
           // 2. Update Current Weights sheet (delete old, insert new)
-          // First, get current data to know what to delete
           const currentWeightsRows = [];
           Object.keys(updatedWeights).forEach(wKey => {
             const workout = updatedWeights[wKey];
@@ -337,21 +340,30 @@
                 'Current Weight': exercise.currentWeight,
                 Unit: workoutDef.exercises[idx].unit,
                 'Sessions at Weight': exercise.sessionsAtWeight,
-                'Last Workout Date': workout.lastWorkoutDate ? new Date(workout.lastWorkoutDate).toLocaleDateString() : ''
+                'Last Workout Date': workout.lastWorkoutDate || ''
               });
             });
           });
           
-          // Delete all and reinsert (simple approach for small dataset)
-          await fetch(`${SHEETDB_API}/all?sheet=Current Weights`, {
-            method: 'DELETE'
-          });
+          // Delete all existing rows (ignore errors if sheet is empty)
+          try {
+            await fetch(`${SHEETDB_API}/all?sheet=Current Weights`, {
+              method: 'DELETE'
+            });
+          } catch (deleteError) {
+            console.log('Delete skipped (sheet might be empty)');
+          }
           
-          await fetch(`${SHEETDB_API}?sheet=Current Weights`, {
+          // Insert updated weights
+          const weightsResponse = await fetch(`${SHEETDB_API}?sheet=Current Weights`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ data: currentWeightsRows })
           });
+          
+          if (!weightsResponse.ok) {
+            throw new Error('Failed to update current weights');
+          }
           
           // 3. Add workout summary
           await fetch(`${SHEETDB_API}?sheet=Workout History`, {
@@ -371,12 +383,13 @@
           setSyncStatus('synced');
           setLastSyncTime(new Date());
           setTimeout(() => setSyncStatus('idle'), 2000);
-          console.log('✅ Batch sync complete! (3 API calls total)');
+          console.log('✅ Batch sync complete!');
           
         } catch (error) {
           console.error('Batch sync error:', error);
           setSyncStatus('error');
           setTimeout(() => setSyncStatus('idle'), 3000);
+          throw error; // Re-throw so finishWorkout can handle it
         }
       };
 
@@ -455,13 +468,26 @@
         });
 
         updatedData[currentWorkout].lastWorkoutDate = new Date().toISOString();
-        setWorkoutData(updatedData);
-
-        // OPTIMIZED: Single batch sync at end of workout
-        await syncBatchToSheets(currentWorkout, log, updatedData);
         
-        alert('Workout Complete! 💪\\n\\nData synced to Google Sheets!');
+        // IMPORTANT: Save to state and localStorage BEFORE syncing
+        setWorkoutData(updatedData);
+        
+        // Store the workout key before clearing it
+        const completedWorkout = currentWorkout;
+        
+        // Clear workout state immediately to prevent loops
         setCurrentWorkout(null);
+        setSessionLog([]);
+        setCurrentExerciseIndex(0);
+        setCurrentSet(1);
+
+        // OPTIMIZED: Single batch sync at end of workout (non-blocking)
+        syncBatchToSheets(completedWorkout, log, updatedData).then(() => {
+          alert('Workout Complete! 💪\\n\\nData synced to Google Sheets!');
+        }).catch(err => {
+          console.error('Sync failed:', err);
+          alert('Workout Complete! 💪\\n\\nWarning: Sync to Sheets failed. Data saved locally.');
+        });
       };
 
       const updateWeight = (workoutKey, exerciseIndex, newWeight) => {
@@ -516,7 +542,12 @@
                         {workoutData[key].lastWorkoutDate && (
                           <div className="text-blue-300 text-xs mt-1">
                             Last: {typeof workoutData[key].lastWorkoutDate === 'string' && workoutData[key].lastWorkoutDate.includes('T') 
-                              ? new Date(workoutData[key].lastWorkoutDate).toLocaleDateString() 
+                              ? new Date(workoutData[key].lastWorkoutDate).toLocaleString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: 'numeric',
+                                  minute: '2-digit'
+                                })
                               : workoutData[key].lastWorkoutDate}
                           </div>
                         )}
