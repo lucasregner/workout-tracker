@@ -100,16 +100,17 @@
       const [syncStatus, setSyncStatus] = useState('idle');
       const [lastSyncTime, setLastSyncTime] = useState(null);
       const [isLoadingFromSheets, setIsLoadingFromSheets] = useState(false);
+      const [wakeLock, setWakeLock] = useState(null);
 
       const workouts = {
         A: {
           name: 'Workout A - Home',
           location: 'Home',
           exercises: [
+            { name: 'Squats with Overhead Press', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 },
             { name: 'Dumbbell Chest Press (Flat)', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 },
             { name: 'Standing Row', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 },
-            { name: 'Bulgarian Split Squats', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 },
-            { name: 'Squats with Overhead Press', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 }
+            { name: 'Bulgarian Split Squats', sets: 3, reps: 8, equipment: 'dumbbell', unit: 'lbs', increment: 5 }
           ]
         },
         B: {
@@ -291,11 +292,40 @@
         return 8;
       };
 
-      const startWorkout = (workoutKey) => {
+      const startWorkout = async (workoutKey) => {
         setCurrentWorkout(workoutKey);
         setCurrentExerciseIndex(0);
         setCurrentSet(1);
         setSessionLog([]);
+        
+        // Request wake lock to keep screen on during workout
+        if ('wakeLock' in navigator) {
+          try {
+            const lock = await navigator.wakeLock.request('screen');
+            setWakeLock(lock);
+            console.log('Wake Lock activated - screen will stay on');
+            
+            // Re-acquire wake lock if it's released (e.g., phone call)
+            lock.addEventListener('release', () => {
+              console.log('Wake Lock released');
+            });
+          } catch (err) {
+            console.warn('Wake Lock failed:', err);
+          }
+        }
+      };
+
+      // Release wake lock when workout ends
+      const releaseWakeLock = async () => {
+        if (wakeLock) {
+          try {
+            await wakeLock.release();
+            setWakeLock(null);
+            console.log('Wake Lock released');
+          } catch (err) {
+            console.warn('Wake Lock release failed:', err);
+          }
+        }
       };
 
       // OPTIMIZED: Batch sync - only send data at end of workout
@@ -480,6 +510,9 @@
         setSessionLog([]);
         setCurrentExerciseIndex(0);
         setCurrentSet(1);
+        
+        // Release wake lock
+        releaseWakeLock();
 
         // OPTIMIZED: Single batch sync at end of workout (non-blocking)
         syncBatchToSheets(completedWorkout, log, updatedData).then(() => {
@@ -860,6 +893,7 @@
                     </button>
                     <button
                       onClick={() => {
+                        releaseWakeLock();
                         setCurrentWorkout(null);
                         setSessionLog([]);
                         setCurrentExerciseIndex(0);

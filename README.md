@@ -8,7 +8,9 @@ Personal workout tracker with optimized Google Sheets sync. Built with React.
 - ✅ 3 customizable workouts (A, B, C) - 2 home workouts, 1 gym workout
 - ✅ Smart progression tracking with 3-session system for dumbbells
 - ✅ Reverse progression for dumbbells (strongest on last set)
+- ✅ **Screen stays awake during workouts** - Wake Lock API prevents sleep
 - ✅ Rest timer with visual countdown and vibration
+- ✅ Timer continues running even without screen interaction
 - ✅ Plate calculator for barbell exercises
 - ✅ Mobile-optimized PWA (install to home screen)
 
@@ -84,10 +86,10 @@ Before using the app, you need:
 
 ### Workout A - Home (Dumbbells, 3x8)
 Progressive resistance with 5 lbs increments
+- Squats with Overhead Press
 - Dumbbell Chest Press (Flat)
 - Standing Row
 - Bulgarian Split Squats
-- Squats with Overhead Press
 
 ### Workout B - Gym (Barbell, 5x5)
 Heavy compound lifts with 5 kg increments
@@ -126,8 +128,25 @@ Unique reverse progression where you're strongest on later sets:
 - **Styling**: Tailwind CSS
 - **Data Sync**: SheetDB API → Google Sheets
 - **Storage**: localStorage (offline backup)
+- **Screen Wake**: Wake Lock API (prevents screen sleep during workouts)
 - **Hosting**: Netlify
 - **PWA**: Installable on mobile devices
+
+## 📱 Mobile Features
+
+### Wake Lock (Screen Stays On)
+The app uses the **Wake Lock API** to keep your screen awake during workouts:
+- ✅ Screen stays on automatically when you start a workout
+- ✅ Timer continues running without any interaction
+- ✅ No more screen dimming during rest periods
+- ✅ Automatically releases when workout completes or you exit
+- ✅ Battery efficient - only keeps display active
+
+**Browser Support:**
+- iOS Safari 16.4+ (iPhone with iOS 16.4 or later)
+- Android Chrome/Edge
+- Most modern mobile browsers
+- Gracefully degrades on older browsers (timer still works)
 
 ## 📊 API Efficiency
 
@@ -147,6 +166,18 @@ To modify exercises or progression:
 1. Edit the `workouts` object in `index.html`
 2. Adjust `increment` values for different weight jumps
 3. Modify `getTargetReps` function for different rep schemes
+
+## 📝 Changelog
+
+### Latest Updates
+- ✅ **Wake Lock API** - Screen stays on during workouts, timer runs continuously
+- ✅ **Exercise reordering** - Squats with Overhead Press moved to first in Workout A
+- ✅ **Barbell progression** - Changed from 0.5kg to 5kg increments for realistic strength gains
+- ✅ **Timestamps** - Added time of day to "Last workout" display
+- ✅ **Optimized sync** - Reduced API calls from 40+ to 3 per workout
+- ✅ **Auto-load weights** - Pulls current weights from Google Sheets on app startup
+- ✅ **Error handling** - Improved network failure recovery
+- ✅ **Bug fixes** - Fixed workout loop bug, date format consistency
 
 ## 📝 License
 
