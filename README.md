@@ -124,13 +124,16 @@ Unique reverse progression where you're strongest on later sets:
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18 (via CDN)
-- **Styling**: Tailwind CSS
+- **Frontend**: React 18.2.0 (via CDN, pinned version)
+- **Styling**: Tailwind CSS 3.4.1 (pinned version)
+- **JSX Transform**: Babel Standalone 7.23.5 (pinned version)
 - **Data Sync**: SheetDB API → Google Sheets
 - **Storage**: localStorage (offline backup)
 - **Screen Wake**: Wake Lock API (prevents screen sleep during workouts)
 - **Hosting**: Netlify
 - **PWA**: Installable on mobile devices
+
+> **Note:** All CDN dependencies are pinned to specific versions to prevent breaking changes from upstream updates.
 
 ## 📱 Mobile Features
 
@@ -167,9 +170,36 @@ To modify exercises or progression:
 2. Adjust `increment` values for different weight jumps
 3. Modify `getTargetReps` function for different rep schemes
 
+## 🐛 Troubleshooting
+
+### App shows blank white screen
+This is usually caused by a JavaScript error. Check the browser console (F12 → Console) for red errors.
+
+**Common fixes:**
+- Hard refresh: Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
+- Clear browser cache
+- Add `?v=2` to URL to bypass cache
+
+### CDN Breaking Changes
+If the app suddenly stops working after months of use, a CDN dependency may have updated. All dependencies are now pinned to specific versions to prevent this:
+
+```html
+<!-- Pinned versions in index.html -->
+<script src="https://cdn.tailwindcss.com/3.4.1"></script>
+<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
+```
+
+### Data not syncing
+- Check that SheetDB API is still active (free tier limits)
+- Verify Google Sheet permissions haven't changed
+- Check browser console for network errors
+
 ## 📝 Changelog
 
 ### Latest Updates
+- ✅ **Pinned CDN versions** - Fixed breaking change from Babel update; all dependencies now locked to stable versions
 - ✅ **Wake Lock API** - Screen stays on during workouts, timer runs continuously
 - ✅ **Exercise reordering** - Squats with Overhead Press moved to first in Workout A
 - ✅ **Barbell progression** - Changed from 0.5kg to 5kg increments for realistic strength gains
